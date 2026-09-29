@@ -1,4 +1,4 @@
-name: Build Stable Android APK
+name: Build Android APK with Cordova
 
 on:
   push:
@@ -24,42 +24,40 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Generate Android Project via Bubblewrap
-        run: |
-          npm install -g @bubblewrap/cli
-          cat << 'JSON' > twa-manifest.json
-          {
-            "packageId": "com.apknew.app",
-            "host": "20091211mn.github.io",
-            "name": "تطبيقي",
-            "launcherName": "تطبيقي",
-            "display": "standalone",
-            "themeColor": "#1e1e2f",
-            "navigationColor": "#121212",
-            "backgroundColor": "#121212",
-            "enableNotifications": false,
-            "startUrl": "/apknew/",
-            "iconUrl": "https://dummyimage.com/512x512/000/fff.png",
-            "maskableIconUrl": "https://dummyimage.com/512x512/000/fff.png",
-            "appVersionName": "1.0.0",
-            "appVersionCode": 1,
-            "generatorApp": "bubblewrap-cli",
-            "webManifestUrl": "https://20091211mn.github.io/apknew/manifest.json",
-            "fallbackType": "customtabs",
-            "features": {},
-            "alphaDependencies": { "enabled": false }
-          }
-          JSON
-          bubblewrap init --manifest=twa-manifest.json --directory=android-project
+      - name: Install Cordova
+        run: npm install -g cordova
 
-      - name: Build APK using Gradle (Official Android Tool)
+      - name: Create Cordova App & Set WebView
         run: |
-          cd android-project
-          chmod +x gradlew
-          ./gradlew assembleDebug
+          # إنشاء مشروع جديد
+          cordova create myApp com.apknew.app "تطبيقي"
+          cd myApp
+          
+          # إضافة منصة الأندرويد
+          cordova platform add android
+          
+          # توجيه التطبيق لفتح رابط موقعك مباشرة داخل WebView
+          cat << 'XML' > config.xml
+          <?xml version='1.0' encoding='utf-8'?>
+          <widget id="com.apknew.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+              <name>تطبيقي</name>
+              <description>تطبيق ويب</description>
+              <author email="dev@example.com">Developer</author>
+              <content src="https://20091211mn.github.io/apknew/" />
+              <allow-navigation href="https://20091211mn.github.io/apknew/*" />
+              <allow-intent href="http://*/*" />
+              <allow-intent href="https://*/*" />
+              <preference name="Scheme" value="https" />
+          </widget>
+          XML
+
+      - name: Build Android APK
+        run: |
+          cd myApp
+          cordova build android --debug
 
       - name: Upload Generated APK
         uses: actions/upload-artifact@v4
         with:
-          name: App-Debug-APK
-          path: android-project/app/build/outputs/apk/debug/*.apk
+          name: App-Cordova-APK
+          path: myApp/platforms/android/app/build/outputs/apk/debug/*.apk
