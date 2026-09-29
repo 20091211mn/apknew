@@ -57,11 +57,14 @@ jobs:
 
       - name: Build Unsigned APK
         run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;34.0.0" "platforms;android-34"
+          
           mkdir -p ~/.bubblewrap
           cat << JSON > ~/.bubblewrap/config.json
           {
             "jdkPath": "$JAVA_HOME",
-            "androidSdkPath": "/usr/local/lib/android/sdk"
+            "androidSdkPath": "$ANDROID_HOME"
           }
           JSON
           bubblewrap build --skipSigning
