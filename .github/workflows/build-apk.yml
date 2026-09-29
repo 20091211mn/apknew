@@ -1,5 +1,4 @@
 name: Build Android APK
-
 on:
   push:
     branches: [ main ]
@@ -9,56 +8,70 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+    - name: Checkout Repository
+      uses: actions/checkout@v4
 
-      - name: Setup Java JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
+    - name: Setup Java JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
 
-      - name: Install Bubblewrap CLI
-        run: npm install -g @bubblewrap/cli
+    - name: Install Bubblewrap CLI
+      run: npm install -g @bubblewrap/cli
 
-      - name: Create TWA Configuration
-        run: |
-          cat << 'JSON' > twa-manifest.json
-          {
-            "packageId": "io.github.mn20091211.apknew",
-            "host": "20091211mn.github.io",
-            "name": "APK New App",
-            "launcherName": "APK New",
-            "display": "standalone",
-            "themeColor": "#FFFFFF",
-            "navigationColor": "#000000",
-            "backgroundColor": "#FFFFFF",
-            "enableNotifications": false, "startUrl": "/apknew/",
-            "iconUrl": "https://20091211mn.github.io/apknew/icon.png",
-            "maskableIconUrl": "https://20091211mn.github.io/apknew/icon.png",
-            "appVersionName": "1.0.0",
-            "appVersionCode": 1,
-            "generatorApp": "bubblewrap-cli", "webManifestUrl": "https://20091211mn.github.io/apknew/manifest.json",
-            "fallbackType": "customtabs",
-            "features": {},
-            "alphaDependencies": {
-              "enabled": false
-            }
+    # خطوة أساسية لتهيئة إعدادات Bubblewrap وتجنب الأسئلة التفاعلية
+    - name: Initialize Bubblewrap Configuration
+      run: |
+        mkdir -p ~/.bubblewrap
+        cat << 'JSON' > ~/.bubblewrap/config.json
+        {
+          "jdkPath": "${{ env.JAVA_HOME }}",
+          "androidSdkPath": "${{ env.ANDROID_HOME }}"
+        }
+        JSON
+
+    - name: Create TWA Configuration
+      run: |
+        cat << 'JSON' > twa-manifest.json
+        {
+          "packageId": "io.github.mn20091211.apknew",
+          "host": "20091211mn.github.io",
+          "name": "APK New App",
+          "launcherName": "APK New",
+          "display": "standalone",
+          "themeColor": "#FFFFFF",
+          "navigationColor": "#000000",
+          "backgroundColor": "#FFFFFF",
+          "enableNotifications": false,
+          "startUrl": "/apknew/",
+          "iconUrl": "https://20091211mn.github.io/apknew/icon.png",
+          "maskableIconUrl": "https://20091211mn.github.io/apknew/icon.png",
+          "appVersionName": "1.0.0",
+          "appVersionCode": 1,
+          "generatorApp": "bubblewrap-cli",
+          "webManifestUrl": "https://20091211mn.github.io/apknew/manifest.json",
+          "fallbackType": "customtabs",
+          "features": {},
+          "alphaDependencies": {
+            "enabled": false
           }
-          JSON
+        }
+        JSON
 
-      - name: Generate Android Project & Build APK
-        run: |
-          bubblewrap update
-          bubblewrap build --skipSigning
+    # استخدام خيار --yes لتخطي أي أسئلة تفاعلية أثناء البناء
+    - name: Generate Android Project & Build APK
+      run: |
+        bubblewrap init --manifest=twa-manifest.json --yes
+        bubblewrap build --skipSigning --yes
 
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: App-APK
-          path: ./*.apk
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: App-APK
+        path: ./*.apk
