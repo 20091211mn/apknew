@@ -12,27 +12,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Java JDK
-        uses: actions/setup-java@v4
+      - name: Build Android APK via PWABuilder
+        uses: pwa-builder/pwa-action@v1
         with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Install Bubblewrap CLI
-        run: npm install -g @bubblewrap/cli
-
-      - name: Initialize & Build APK
-        run: |
-          bubblewrap init --manifest=https://20091211mn.github.io/apknew/manifest.json --skipPWABuilderValidation
-          bubblewrap build --signingKeyPath=""
+          manifest-url: 'https://20091211mn.github.io/apknew/manifest.json'
+          output-type: 'apk'
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: App-APK
-          path: ./*.apk
+          path: './*.apk'
