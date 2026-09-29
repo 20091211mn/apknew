@@ -10,25 +10,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Setup Java JDK
-        uses: actions/setup-java@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          distribution: 'zulu'
-          java-version: '17'
+          node-version: 18
 
-      - name: Setup Bubblewrap CLI
-        run: |
-          npm install -g @bubblewrap/cli
-          yes | bubblewrap init --manifest=https://20091211mn.github.io/apknew/manifest.json
+      - name: Install PWA to APK Tool
+        run: npm install -g pwa2apk
 
-      - name: Build Signed APK
-        run: |
-          bubblewrap build
+      - name: Generate APK
+        run: pwa2apk --url https://20091211mn.github.io/apknew/ --out ./app.apk
 
       - name: Upload APK Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: App-APK
           path: ./*.apk
