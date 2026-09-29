@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#333333">
-    <title>تطبيقي البسيط</title>
-    <style>
-        body { font-family: sans-serif; text-align: center; padding: 50px; background-color: #f4f4f9; }
-        h1 { color: #333; }
-    </style>
+    <title>تطبيقي</title>
 </head>
 <body>
     <h1>أهلاً بك في تطبيقي!</h1>
-    <p>هذا تطبيق PWA خفيف يعمل مباشرة بدون مشاكل Vite.</p>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+      }
+    </script>
 </body>
 </html>
