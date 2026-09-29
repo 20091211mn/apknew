@@ -1,0 +1,20 @@
+{
+  "short_name": "تطبيقي",
+  "name": "تطبيقي البسيط PWA",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://via.placeholder.com/512",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#f4f4f9",
+  "theme_color": "#333333",
+  "display": "standalone"
+}
