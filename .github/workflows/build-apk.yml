@@ -60,11 +60,13 @@ jobs:
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;34.0.0" "platforms;android-34"
           
+          # استخراج المسار الفعلي وتحديده لـ Bubblewrap
+          ACTUAL_SDK_PATH="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
           mkdir -p ~/.bubblewrap
           cat << JSON > ~/.bubblewrap/config.json
           {
             "jdkPath": "$JAVA_HOME",
-            "androidSdkPath": "$ANDROID_HOME"
+            "androidSdkPath": "$ACTUAL_SDK_PATH"
           }
           JSON
           bubblewrap build --skipSigning
