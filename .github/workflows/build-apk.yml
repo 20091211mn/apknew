@@ -57,14 +57,11 @@ jobs:
 
       - name: Build Unsigned APK
         run: |
-          # 1. إنشاء أداة مشروع Gradle أولاً
-          bubblewrap init --manifest=twa-manifest.json
-          
-          # 2. تحديد مسارات صريحة ومكتملة لـ Build Tools و SDK
-          export ANDROID_HOME=/usr/local/lib/android/sdk
+          # الموافقة الآلية على التراخيص
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;33.0.2" "platforms;android-33" "cmdline-tools;latest"
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;33.0.2" "platforms;android-33"
 
+          # كتابة الإعدادات لمنع إظهار الأسئلة التفاعلية
           mkdir -p ~/.bubblewrap
           cat << JSON > ~/.bubblewrap/config.json
           {
@@ -73,8 +70,8 @@ jobs:
           }
           JSON
 
-          # 3. البناء التلقائي
-          bubblewrap build --skipSigning
+          # إضافة --yes للموافقة التلقائية وبناء الـ APK
+          bubblewrap build --skipSigning --yes
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
