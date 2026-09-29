@@ -67,7 +67,7 @@ jobs:
 
     - name: Generate Android Project & Build APK
       run: |
-        echo "no" | bubblewrap init --manifest=twa-manifest.json --yes
+        bubblewrap init --manifest=twa-manifest.json --skipIntermediatePrompt --yes
         bubblewrap build --skipSigning --yes
 
     - name: Upload APK Artifact
