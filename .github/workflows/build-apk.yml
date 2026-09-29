@@ -57,18 +57,21 @@ jobs:
 
       - name: Build Unsigned APK
         run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;34.0.0" "platforms;android-34"
+          # نستخدم المسار المدمج الافتراضي للـ SDK الموجود في السيرفر
+          export ANDROID_HOME=/usr/local/lib/android/sdk
           
-          # استخراج المسار الفعلي وتحديده لـ Bubblewrap
-          ACTUAL_SDK_PATH="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          # قبول التراخيص لـ Android SDK المدمج
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
+          # تهيئة إعدادات Bubblewrap بالإشارة للمسار الأساسي و Java
           mkdir -p ~/.bubblewrap
           cat << JSON > ~/.bubblewrap/config.json
           {
             "jdkPath": "$JAVA_HOME",
-            "androidSdkPath": "$ACTUAL_SDK_PATH"
+            "androidSdkPath": "$ANDROID_HOME"
           }
           JSON
+
           bubblewrap build --skipSigning
 
       - name: Upload APK Artifact
