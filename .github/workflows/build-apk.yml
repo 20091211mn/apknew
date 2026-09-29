@@ -12,14 +12,53 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Build Android APK via PWABuilder
-        uses: pwa-builder/pwa-action@v1
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
         with:
-          manifest-url: 'https://20091211mn.github.io/apknew/manifest.json'
-          output-type: 'apk'
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Bubblewrap CLI
+        run: npm install -g @bubblewrap/cli
+
+      - name: Create TWA Configuration
+        run: |
+          cat << 'JSON' > twa-manifest.json
+          {
+            "packageId": "io.github.mn20091211.apknew",
+            "host": "20091211mn.github.io",
+            "name": "APK New App",
+            "launcherName": "APK New",
+            "display": "standalone",
+            "themeColor": "#FFFFFF",
+            "navigationColor": "#000000",
+            "backgroundColor": "#FFFFFF",
+            "enableNotifications": false, "startUrl": "/apknew/",
+            "iconUrl": "https://20091211mn.github.io/apknew/icon.png",
+            "maskableIconUrl": "https://20091211mn.github.io/apknew/icon.png",
+            "appVersionName": "1.0.0",
+            "appVersionCode": 1,
+            "generatorApp": "bubblewrap-cli", "webManifestUrl": "https://20091211mn.github.io/apknew/manifest.json",
+            "fallbackType": "customtabs",
+            "features": {},
+            "alphaDependencies": {
+              "enabled": false
+            }
+          }
+          JSON
+
+      - name: Generate Android Project & Build APK
+        run: |
+          bubblewrap update
+          bubblewrap build --skipSigning
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: App-APK
-          path: './*.apk'
+          path: ./*.apk
