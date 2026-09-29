@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Stable Android APK
 
 on:
   push:
@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Java JDK
+      - name: Setup Java JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -24,11 +24,9 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install Bubblewrap CLI
-        run: npm install -g @bubblewrap/cli
-
-      - name: Create TWA Manifest
+      - name: Generate Android Project via Bubblewrap
         run: |
+          npm install -g @bubblewrap/cli
           cat << 'JSON' > twa-manifest.json
           {
             "packageId": "com.apknew.app",
@@ -49,32 +47,19 @@ jobs:
             "webManifestUrl": "https://20091211mn.github.io/apknew/manifest.json",
             "fallbackType": "customtabs",
             "features": {},
-            "alphaDependencies": {
-              "enabled": false
-            }
+            "alphaDependencies": { "enabled": false }
           }
           JSON
+          bubblewrap init --manifest=twa-manifest.json --directory=android-project
 
-      - name: Build Unsigned APK
+      - name: Build APK using Gradle (Official Android Tool)
         run: |
-          # الموافقة الآلية على التراخيص
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;33.0.2" "platforms;android-33"
+          cd android-project
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
-          # كتابة الإعدادات لمنع إظهار الأسئلة التفاعلية
-          mkdir -p ~/.bubblewrap
-          cat << JSON > ~/.bubblewrap/config.json
-          {
-            "jdkPath": "$JAVA_HOME",
-            "androidSdkPath": "$ANDROID_HOME"
-          }
-          JSON
-
-          # إضافة --yes للموافقة التلقائية وبناء الـ APK
-          bubblewrap build --skipSigning --yes
-
-      - name: Upload APK Artifact
+      - name: Upload Generated APK
         uses: actions/upload-artifact@v4
         with:
-          name: App-APK
-          path: ./*.apk
+          name: App-Debug-APK
+          path: android-project/app/build/outputs/apk/debug/*.apk
