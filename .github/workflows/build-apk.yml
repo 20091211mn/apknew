@@ -27,14 +27,6 @@ jobs:
       - name: Install Bubblewrap CLI
         run: npm install -g @bubblewrap/cli
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Accept Licenses & Install Android Build Tools
-        run: |
-          yes | sdkmanager --licenses
-          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
-
       - name: Create TWA Manifest
         run: |
           cat << 'JSON' > twa-manifest.json
@@ -69,7 +61,7 @@ jobs:
           cat << JSON > ~/.bubblewrap/config.json
           {
             "jdkPath": "$JAVA_HOME",
-            "androidSdkPath": "$ANDROID_HOME"
+            "androidSdkPath": "/usr/local/lib/android/sdk"
           }
           JSON
           bubblewrap build --skipSigning
