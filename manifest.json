@@ -1,19 +1,21 @@
 {
   "short_name": "تطبيقي",
-  "name": "تطبيقي البسيط PWA",
+  "name": "تطبيق PWA الجديد",
   "icons": [
     {
-      "src": "https://via.placeholder.com/192",
+      "src": "https://via.placeholder.com/192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
-      "src": "https://via.placeholder.com/512",
+      "src": "https://via.placeholder.com/512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
-  "start_url": "/",
+  "start_url": "./",
   "background_color": "#f4f4f9",
   "theme_color": "#333333",
   "display": "standalone"
